@@ -43,8 +43,8 @@ func PlayLeague(writer http.ResponseWriter, request *http.Request) {
 
 func simulateMatch(homeTeam models.Team, awayTeam models.Team) (int, int) {
 	rand.Seed(time.Now().UnixNano())
-	homeGoals := rand.Intn(homeTeam.Strength+1)
-	awayGoals := rand.Intn(awayTeam.Strength+1)
+	homeGoals := rand.Intn(homeTeam.Strength/10 + 1)
+	awayGoals := rand.Intn(awayTeam.Strength/10 + 1)
 	return homeGoals, awayGoals
 }
 func updateTeamStats(homeTeam *models.Team, awayTeam *models.Team, homeGoals int, awayGoals int) {
