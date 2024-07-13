@@ -1,4 +1,5 @@
 package models
+
 import (
 	"backend_case/pkg/config"
 
@@ -20,15 +21,4 @@ func init(){
 	config.Connect()
 	db = config.GetDB()
 	db.AutoMigrate(&Team{})
-}
-
-func(b *Team) CreateTeam() *Team{
-	db.Create(&b)
-	return b
-}
-
-func GetAllTeams() []Team {
-	var Teams []Team
-	db.Find(&Teams)
-	return Teams
 }

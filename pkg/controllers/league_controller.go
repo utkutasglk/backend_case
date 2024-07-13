@@ -10,7 +10,7 @@ import (
 )
 
 
-func CreateMatch(writer http.ResponseWriter, request *http.Request) {
+func PlayLeague(writer http.ResponseWriter, request *http.Request) {
 
 	var teams []models.Team
 	config.DB.Find(&teams)
