@@ -29,6 +29,7 @@ func PlayLeague(writer http.ResponseWriter, request *http.Request) {
 				match.HomeGoals = homeGoals
 				match.AwayGoals = awayGoals
 
+				updateTeamStats(&teams[i], &teams[j], homeGoals, awayGoals)
 				config.DB.Create(&match)
 				matches = append(matches, match)
 			}
@@ -46,4 +47,30 @@ func simulateMatch(homeTeam models.Team, awayTeam models.Team) (int, int) {
 	awayGoals := rand.Intn(awayTeam.Strength+1)
 	return homeGoals, awayGoals
 }
+func updateTeamStats(homeTeam *models.Team, awayTeam *models.Team, homeGoals int, awayGoals int) {
+	if homeGoals > awayGoals {
+		homeTeam.Points += 3
+		homeTeam.Wins += 1
+		awayTeam.Losses += 1
+	} else if homeGoals < awayGoals {
+		awayTeam.Points += 3
+		awayTeam.Wins += 1
+		homeTeam.Losses += 1
+	} else {
+		homeTeam.Points += 1
+		awayTeam.Points += 1
+		homeTeam.Draws += 1
+		awayTeam.Draws += 1
+	}
 
+	homeTeam.GoalFor += homeGoals
+	homeTeam.GoalAgainst += awayGoals
+	homeTeam.GoalDifference = homeTeam.GoalFor - homeTeam.GoalAgainst
+
+	awayTeam.GoalFor += awayGoals
+	awayTeam.GoalAgainst += homeGoals
+	awayTeam.GoalDifference = awayTeam.GoalFor - awayTeam.GoalAgainst
+
+	config.DB.Save(homeTeam)
+	config.DB.Save(awayTeam)
+}
