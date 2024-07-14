@@ -11,7 +11,7 @@ import (
 func main() {
 
 	router :=mux.NewRouter()
-	routes.RegisterRoutes(router)
+	routes.CreateRouters(router)
 	http.Handle("/", router)
 	log.Println("Listening on port 8000")
 	log.Fatal(http.ListenAndServe(":8000",router))

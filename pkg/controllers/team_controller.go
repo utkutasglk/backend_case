@@ -18,7 +18,7 @@ func CreateTeam(writer http.ResponseWriter, request *http.Request){
 	
 }
 
-func GetTeam(writer http.ResponseWriter, request *http.Request){
+func GetTeams(writer http.ResponseWriter, request *http.Request){
 
 	var teams []models.Team
 	config.DB.Find(&teams)

@@ -11,14 +11,14 @@ var db *gorm.DB
 type Team struct{
 	Id int      `json:"id"`
 	Name string `json:"name"`
-	Strength int `json:"strength"`
+	Power int `json:"power"`
 	Points int  `json:"points"`
 	Wins    int    `json:"wins"`
 	Draws   int    `json:"draws"`
 	Losses  int    `json:"losses"`
-	GoalFor int `json:"goal_for"`
-	GoalAgainst int `json:"goal_against"`
-	GoalDifference int `json:"goal_difference"`
+	GoalScore int `json:"goal_score"`
+	GoalConcede int `json:"goal_concede"`
+	GoalDiff int `json:"goal_diff"`
 
 }
 

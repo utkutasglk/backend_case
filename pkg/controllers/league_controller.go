@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-
+// tum ligi oyna
 func PlayLeague(writer http.ResponseWriter, request *http.Request) {
 
 	// olusturulan takimlari arrayda topla
@@ -54,13 +54,16 @@ type game struct {
 
 func createMatchFixture(numTeams int) [][]game {
 
+	// takim sayisi tek ise ++1 arttir
 	if numTeams%2 != 0 {
 		numTeams++
 	}
 
+	// icerde ve disarda oynanacak maclar icin hafta numarasini 2 ile carp
 	numWeeks := (numTeams - 1) * 2
 	gamesPerWeek := numTeams / 2
 
+	// olusturdugumuz game struct sayesinde takimlari esle
 	schedule := make([][]game, numWeeks)
 	for week := 0; week < numWeeks; week++ {
 		schedule[week] = make([]game, gamesPerWeek)
@@ -77,16 +80,18 @@ func createMatchFixture(numTeams int) [][]game {
 	return schedule
 }
 
+// mac skorunu takim guclerine ve random sayilara gore belirle
 func simulateMatch(homeTeam models.Team, awayTeam models.Team) (int, int) {
 	rand.Seed(time.Now().UnixNano())
-	homeGoals := rand.Intn(homeTeam.Strength/100 + 5)
-	awayGoals := rand.Intn(awayTeam.Strength/100 + 5)
+	homeGoals := rand.Intn(homeTeam.Power/100 + 5)
+	awayGoals := rand.Intn(awayTeam.Power/100 + 5)
 	return homeGoals, awayGoals
 }
 
 // database guncelle
 func updateData(homeTeam *models.Team, awayTeam *models.Team, homeGoals int, awayGoals int) {
 
+	// skora gore puan guncellemesi yap
 	if homeGoals > awayGoals {
 		homeTeam.Points += 3
 		homeTeam.Wins += 1
@@ -101,15 +106,17 @@ func updateData(homeTeam *models.Team, awayTeam *models.Team, homeGoals int, awa
 		homeTeam.Draws += 1
 		awayTeam.Draws += 1
 	}
+	
+	// atilan ve yenilen golleri ekle
+	homeTeam.GoalScore += homeGoals
+	homeTeam.GoalConcede += awayGoals
+	homeTeam.GoalDiff = homeTeam.GoalScore - homeTeam.GoalConcede
 
-	homeTeam.GoalFor += homeGoals
-	homeTeam.GoalAgainst += awayGoals
-	homeTeam.GoalDifference = homeTeam.GoalFor - homeTeam.GoalAgainst
+	awayTeam.GoalScore += awayGoals
+	awayTeam.GoalConcede += homeGoals
+	awayTeam.GoalDiff = awayTeam.GoalScore - awayTeam.GoalConcede
 
-	awayTeam.GoalFor += awayGoals
-	awayTeam.GoalAgainst += homeGoals
-	awayTeam.GoalDifference = awayTeam.GoalFor - awayTeam.GoalAgainst
-
+	// database kaydet
 	config.DB.Save(homeTeam)
 	config.DB.Save(awayTeam)
 }
