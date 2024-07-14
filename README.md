@@ -94,6 +94,9 @@ Sonrasında config/app.go dosyasına giderek kullanıcı adı ve parola yazdıkt
   GET http://localhost:8000/matches
 ```
 
+## Mesaj
+- Aldığım "invalid memory address or nil pointer dereference golang sql" hatasından dolayı, models package'inden league.go modeli ve bir kaç endpointi silmek zorunda kaldım.
+
 
 
 [Back To The Top](#read-me-template)
