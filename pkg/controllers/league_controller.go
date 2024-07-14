@@ -12,42 +12,81 @@ import (
 
 func PlayLeague(writer http.ResponseWriter, request *http.Request) {
 
+	// olusturulan takimlari arrayda topla
 	var teams []models.Team
 	config.DB.Find(&teams)
 
-	var matches []models.Match
-	weeks := len(teams) - 1
-	for i := 0; i < weeks; i++ {
-		for j := 0; j < len(teams); j++ {
-			if j != i {
-				match := models.Match{
-					HomeTeamID: teams[i].Id,
-					AwayTeamID: teams[j].Id,
-					Week:       i + 1,
-				}
-				homeGoals, awayGoals := simulateMatch(teams[i], teams[j])
-				match.HomeGoals = homeGoals
-				match.AwayGoals = awayGoals
+	// Mac fiksturunu olusturmak icin yeni bir metoda yonlendir
+	schedule := createMatchFixture(len(teams))
 
-				updateTeamStats(&teams[i], &teams[j], homeGoals, awayGoals)
-				config.DB.Create(&match)
-				matches = append(matches, match)
+	
+	var matches []models.Match
+
+	for week, games := range schedule {
+		for _, game := range games {
+			homeTeam := teams[game.home]
+			awayTeam := teams[game.away]
+
+			match := models.Match{
+				HomeTeamID: homeTeam.Id,
+				AwayTeamID: awayTeam.Id,
+				Week:       week + 1,
 			}
+
+			homeGoals, awayGoals := simulateMatch(homeTeam, awayTeam)
+			match.HomeGoals = homeGoals
+			match.AwayGoals = awayGoals
+
+			updateData(&teams[game.home], &teams[game.away], homeGoals, awayGoals)
+			config.DB.Create(&match)
+			matches = append(matches, match)
 		}
 	}
 
 	writer.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(writer).Encode(matches)
-	
+}
+
+type game struct {
+	home int
+	away int
+}
+
+func createMatchFixture(numTeams int) [][]game {
+
+	if numTeams%2 != 0 {
+		numTeams++
+	}
+
+	numWeeks := (numTeams - 1) * 2
+	gamesPerWeek := numTeams / 2
+
+	schedule := make([][]game, numWeeks)
+	for week := 0; week < numWeeks; week++ {
+		schedule[week] = make([]game, gamesPerWeek)
+		for match := 0; match < gamesPerWeek; match++ {
+			home := (week + match) % (numTeams - 1)
+			away := (numTeams - 1 - match + week) % (numTeams - 1)
+			if match == 0 {
+				away = numTeams - 1
+			}
+			schedule[week][match] = game{home: home, away: away}
+		}
+	}
+
+	return schedule
 }
 
 func simulateMatch(homeTeam models.Team, awayTeam models.Team) (int, int) {
 	rand.Seed(time.Now().UnixNano())
-	homeGoals := rand.Intn(homeTeam.Strength/10 + 1)
-	awayGoals := rand.Intn(awayTeam.Strength/10 + 1)
+	homeGoals := rand.Intn(homeTeam.Strength/100 + 5)
+	awayGoals := rand.Intn(awayTeam.Strength/100 + 5)
 	return homeGoals, awayGoals
 }
-func updateTeamStats(homeTeam *models.Team, awayTeam *models.Team, homeGoals int, awayGoals int) {
+
+// database guncelle
+func updateData(homeTeam *models.Team, awayTeam *models.Team, homeGoals int, awayGoals int) {
+
 	if homeGoals > awayGoals {
 		homeTeam.Points += 3
 		homeTeam.Wins += 1
