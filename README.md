@@ -68,6 +68,7 @@ Sonrasında config/app.go dosyasına giderek kullanıcı adı ve parola yazdıkt
 ```http
   POST http://localhost:8000/team
 ```
+<img width="718" alt="Screenshot 2024-07-14 at 11 25 53" src="https://github.com/user-attachments/assets/5be3e51a-c4ca-45f6-a308-249e35a735b9">
 
 #### Get All Teams
 
