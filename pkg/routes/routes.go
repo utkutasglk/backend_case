@@ -15,7 +15,4 @@ var CreateRouters = func (router *mux.Router)  {
 	router.HandleFunc("/matches",controllers.GetMatches).Methods("GET")
 	router.HandleFunc("/matches/{week}", controllers.GetMatchesByWeek).Methods("GET")
 
-
-
-	
 }

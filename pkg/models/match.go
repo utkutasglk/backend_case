@@ -8,7 +8,6 @@ import (
 
 var DB *gorm.DB
 
-
 type Match struct {
 	Id          int `json:"id"`
 	HomeTeamID  int `json:"home_team_id"`
